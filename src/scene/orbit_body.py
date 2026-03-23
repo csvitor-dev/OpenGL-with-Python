@@ -2,9 +2,7 @@ import pyrr
 
 
 class OrbitBody:
-
-    def __init__(self, distance, size, speed):
-
+    def __init__(self, distance: float, size: float, speed: float):
         self.distance = distance
         self.size = size
         self.speed = speed
@@ -15,7 +13,6 @@ class OrbitBody:
         self.angle += self.speed * dt
 
     def matrix(self):
-
         rotation = pyrr.matrix44.create_from_z_rotation(self.angle)
 
         translation = pyrr.matrix44.create_from_translation(
