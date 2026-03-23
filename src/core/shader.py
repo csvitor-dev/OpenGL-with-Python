@@ -1,37 +1,23 @@
 from OpenGL.GL import *
+import OpenGL.GL.shaders as gls
 from utils.filesystem import read_file
 
 
 class Shader:
-    def __init__(self, vertex_path, fragment_path):
-        vertex_src = read_file(vertex_path)
-        fragment_src = read_file(fragment_path)
+    def __init__(self, scope: str):
+        vertex_src = read_file(self.__path(scope, 'vertex'))
+        fragment_src = read_file(self.__path(scope, 'fragment'))
 
-        program = glCreateProgram()
-
-        vs = self._compile(vertex_src, GL_VERTEX_SHADER)
-        fs = self._compile(fragment_src, GL_FRAGMENT_SHADER)
-
-        glAttachShader(program, vs)
-        glAttachShader(program, fs)
-        glLinkProgram(program)
-
-        if not glGetProgramiv(program, GL_LINK_STATUS):
-            raise RuntimeError(glGetProgramInfoLog(program))
+        vs = gls.compileShader(vertex_src, GL_VERTEX_SHADER)
+        fs = gls.compileShader(fragment_src, GL_FRAGMENT_SHADER)
+        program = gls.compileProgram(vs, fs)
         glDeleteShader(vs)
         glDeleteShader(fs)
 
         self.program = program
 
-    def _compile(self, source, shader_type):
-        shader = glCreateShader(shader_type)
-
-        glShaderSource(shader, source)
-        glCompileShader(shader)
-
-        if not glGetShaderiv(shader, GL_COMPILE_STATUS):
-            raise RuntimeError(glGetShaderInfoLog(shader))
-        return shader
+    def __path(self, scope: str, type: str) -> str:
+        return f'src/shaders/{scope}/{type}_shader.glsl'
 
     def use(self):
         glUseProgram(self.program)
